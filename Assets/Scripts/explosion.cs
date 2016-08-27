@@ -5,6 +5,6 @@ public class explosion : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-        Destroy(this.gameObject, 1f);
+        Destroy(this.gameObject, 1.5f);
 	}
 }
