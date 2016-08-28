@@ -13,6 +13,6 @@ public class scoreKeeper : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        myText.text = "Hoops: "+LevelManager.hoops;
+		myText.text = "Red: " + LevelManager.redHoops + " - Blue: " + LevelManager.blueHoops;
     }
 }

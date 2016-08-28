@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using InControl;
 
 public class PlayerController : MonoBehaviour {
 
@@ -8,6 +9,8 @@ public class PlayerController : MonoBehaviour {
     public GameObject cannonBall;
     float tension = 0;
     float maxTension = 2;
+
+	public int playerNum;
 
     bool isGrounded = true;
     SpriteRenderer m_Renderer;
@@ -25,17 +28,19 @@ public class PlayerController : MonoBehaviour {
 
     void Update()
     {
-        if(Input.GetAxis("Horizontal") < -0.1f)
+		var inputDevice = (InputManager.Devices.Count > playerNum) ? InputManager.Devices[playerNum] : null;
+
+		if(inputDevice.LeftStickX < -0.1f)
         {
             m_Renderer.flipX = true;
-        } else if (Input.GetAxis("Horizontal") > 0.1f)
+		} else if (inputDevice.LeftStickX > 0.1f)
         {
             m_Renderer.flipX = false;
         }
 
         //m_Meter.transform.position = transform.position + new Vector3(dir() * 1, 11f);
 
-        if (Input.GetButtonDown("Jump"))
+		if (inputDevice.Action1.WasPressed)
         {
             RaycastHit2D down = Physics2D.Raycast(transform.position - (Vector3.up * 8.2f), -Vector2.up * 5);
             if (down.collider != null)
@@ -68,7 +73,7 @@ public class PlayerController : MonoBehaviour {
             Jump();
         }
 
-        if(Input.GetButtonUp("Fire1"))
+		if(inputDevice.Action3.WasReleased)
         {
             Shoot();
         }
@@ -77,12 +82,14 @@ public class PlayerController : MonoBehaviour {
 	
 	// Update is called once per frame
 	void FixedUpdate () {
-        if (Input.GetAxis("Horizontal") != 0)
+		var inputDevice = (InputManager.Devices.Count > playerNum) ? InputManager.Devices[playerNum] : null;
+
+		if (inputDevice.LeftStickX != 0)
         {
-            float x = Input.GetAxis("Horizontal");
+			float x = inputDevice.LeftStickX;
             Move(x);
         }
-        if (Input.GetButton("Fire1"))
+		if (inputDevice.Action3.IsPressed)
         {
 
             if (tension < maxTension)
@@ -90,6 +97,10 @@ public class PlayerController : MonoBehaviour {
                 tension += 0.05f;
             }
         }
+
+		if(!isGrounded)
+
+
         m_Meter.transform.localScale = new Vector3(tension/2, 1, 1);
     }
 
@@ -113,6 +124,7 @@ public class PlayerController : MonoBehaviour {
 
         GameObject clone = Instantiate(cannonBall, transform.position + (new Vector3(transform.forward.x, 10) * 2), Quaternion.identity) as GameObject;
         clone.GetComponent<Rigidbody2D>().AddForce(new Vector2(dir() + m_rb.velocity.magnitude / 50 * dir() + (dir() * 2f), 2f) * tension * 280, ForceMode2D.Impulse);
+		clone.name = playerNum+"";
         tension = 0;
     }
 

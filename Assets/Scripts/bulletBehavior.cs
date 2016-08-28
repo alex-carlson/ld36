@@ -5,6 +5,7 @@ public class bulletBehavior : MonoBehaviour {
 
     public GameObject explo;
     public GameObject glitter;
+	public int playerId;
 
     void Start()
     {
@@ -21,9 +22,18 @@ public class bulletBehavior : MonoBehaviour {
 
         if (col.transform.tag == "Hoop")
         {
-            LevelManager.hoops++;
-            Instantiate(glitter, transform.position, Quaternion.identity);
-            Destroy(col.gameObject);
+
+			if (col.transform.name == "Hoop"+this.transform.name) {
+
+				Instantiate(glitter, transform.position, Quaternion.identity);
+
+				if (this.name == "1") {
+					LevelManager.blueHoops++;
+				} else {
+					LevelManager.redHoops++;
+				}
+			}
+            //Destroy(col.gameObject);
         }
         Instantiate(explo, transform.position, Quaternion.identity);
         Destroy(this.gameObject, 0.1f);
