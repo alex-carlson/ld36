@@ -17,6 +17,9 @@ public class PlayerController : MonoBehaviour {
     Rigidbody2D m_rb;
     Animator m_anim;
     GameObject m_Meter;
+	float m_X;
+	bool m_Jump;
+	bool m_Shoot;
 
     void Start()
     {
@@ -30,17 +33,28 @@ public class PlayerController : MonoBehaviour {
     {
 		var inputDevice = (InputManager.Devices.Count > playerNum) ? InputManager.Devices[playerNum] : null;
 
-		if(inputDevice.LeftStickX < -0.1f)
+		if (inputDevice == null) {
+			Debug.Log ("mapping X to "+playerNum);
+			m_X = Input.GetAxis ("Horizontal" + playerNum);
+			m_Jump = Input.GetButtonDown ("Jump" + playerNum);
+			m_Shoot = Input.GetButtonUp ("Fire1" + playerNum);
+		} else {
+			m_X = inputDevice.LeftStickX;
+			m_Jump = inputDevice.Action1.WasPressed;
+			m_Shoot = inputDevice.Action3.WasReleased;
+		}
+
+		if(m_X < -0.1f)
         {
             m_Renderer.flipX = true;
-		} else if (inputDevice.LeftStickX > 0.1f)
+		} else if (m_X > 0.1f)
         {
             m_Renderer.flipX = false;
         }
 
         //m_Meter.transform.position = transform.position + new Vector3(dir() * 1, 11f);
 
-		if (inputDevice.Action1.WasPressed)
+		if (m_Jump)
         {
             RaycastHit2D down = Physics2D.Raycast(transform.position - (Vector3.up * 8.2f), -Vector2.up * 5);
             if (down.collider != null)
@@ -73,7 +87,7 @@ public class PlayerController : MonoBehaviour {
             Jump();
         }
 
-		if(inputDevice.Action3.WasReleased)
+		if(m_Shoot)
         {
             Shoot();
         }
@@ -84,12 +98,20 @@ public class PlayerController : MonoBehaviour {
 	void FixedUpdate () {
 		var inputDevice = (InputManager.Devices.Count > playerNum) ? InputManager.Devices[playerNum] : null;
 
-		if (inputDevice.LeftStickX != 0)
+		if (inputDevice == null) {
+			m_X = Input.GetAxis ("Horizontal" + playerNum);
+			m_Shoot = Input.GetButton ("Fire1" + playerNum);
+		} else {
+			m_X = inputDevice.LeftStickX;
+			m_Shoot = inputDevice.Action3;
+		}
+
+		if (m_X != 0)
         {
-			float x = inputDevice.LeftStickX;
+			float x = m_X;
             Move(x);
         }
-		if (inputDevice.Action3.IsPressed)
+		if (m_Shoot)
         {
 
             if (tension < maxTension)
